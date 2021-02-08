@@ -21,6 +21,7 @@ class Library {
   constructor(library) {
     this.library = library;
     this.createForm();
+    this.createBookButton();
   }
 
   addBook = (book) => {
@@ -107,16 +108,15 @@ class Library {
       clearValues(event.target.elements);
     });
   }
+
+  createBookButton = () => {
+    const button = document.getElementById('new_book_button');
+    button.addEventListener('click', () => {
+      this.form.style.display = this.form.style.display === 'none' ? 'block' : 'none';
+    });
+  };
 }
 
-const library = new Library(getSavedLibrary());
-
-const bookButton = (form) => {
-  const button = document.getElementById('new_book_button');
-  button.addEventListener('click', () => {
-    form.style.display = form.style.display === 'none' ? 'block' : 'none';
-  });
-};
-
 // RUNNING CODE \\
-bookButton(library.form);
+const library = new Library(getSavedLibrary());
+library.display();
