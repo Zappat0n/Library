@@ -16,15 +16,18 @@ function Book(title, author, pages, status = false) {
 }
 
 class Library {
+  library = [];
+
   constructor(library) {
     this.library = library;
+    this.createForm();
   }
 
-  addBook(book) {
+  addBook = (book) => {
     this.library.push(book);
   }
 
-  changeBookStatus(index) {
+  changeBookStatus = (index) => {
     this.library[index].status = !this.library[index].status;
   }
 
@@ -39,15 +42,15 @@ class Library {
     return checkBtn;
   };
 
-  removeBook(index) {
+  removeBook = (index) => {
     this.library.splice(index, 1);
   }
 
-  toLocalStorage() {
+  toLocalStorage = () => {
     localStorage.setItem('library', JSON.stringify(this.library));
   }
 
-  display() {
+  display = () => {
     const bookBody = document.querySelector('#books_body');
     bookBody.innerHTML = '';
 
@@ -76,39 +79,37 @@ class Library {
       });
     });
   }
+
+  createForm = () => {
+    this.form = document.getElementById('book_form');
+
+    function setValues(book, el) {
+      book.title = el.title.value;
+      book.author = el.author.value;
+      book.pages = el.pages.value;
+      book.status = el.status.checked;
+    }
+
+    function clearValues(el) {
+      el.title.value = '';
+      el.author.value = '';
+      el.pages.value = '';
+      el.status.checked = false;
+    }
+
+    this.form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const book = new Book();
+      setValues(book, event.target.elements);
+      this.addBook(book);
+      this.toLocalStorage();
+      this.display();
+      clearValues(event.target.elements);
+    });
+  }
 }
 
 const library = new Library(getSavedLibrary());
-
-const formModule = ((library) => {
-  const form = document.getElementById('book_form');
-
-  function setValues(book, el) {
-    book.title = el.title.value;
-    book.author = el.author.value;
-    book.pages = el.pages.value;
-    book.status = el.status.checked;
-  }
-
-  function clearValues(el) {
-    el.title.value = '';
-    el.author.value = '';
-    el.pages.value = '';
-    el.status.checked = false;
-  }
-
-  form.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const book = new Book();
-    setValues(book, event.target.elements);
-    library.addBook(book);
-    library.toLocalStorage();
-    library.display();
-    clearValues(event.target.elements);
-  });
-
-  return { form };
-})(library);
 
 const bookButton = (form) => {
   const button = document.getElementById('new_book_button');
@@ -118,4 +119,4 @@ const bookButton = (form) => {
 };
 
 // RUNNING CODE \\
-bookButton(formModule.form);
+bookButton(library.form);
