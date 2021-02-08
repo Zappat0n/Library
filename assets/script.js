@@ -15,16 +15,20 @@ function Book(title, author, pages, status = false) {
   this.status = status;
 }
 
-const libraryModule = ((library) => {
-  const addBook = (book) => {
-    library.push(book);
-  };
+class Library {
+  constructor(library) {
+    this.library = library;
+  }
 
-  const changeBookStatus = (index) => {
-    library[index].status = !library[index].status;
-  };
+  addBook(book) {
+    this.library.push(book);
+  }
 
-  const createButton = (tr, index, _classList, _textContent) => {
+  changeBookStatus(index) {
+    this.library[index].status = !this.library[index].status;
+  }
+
+  createButton = (tr, index, _classList, _textContent) => {
     const td = document.createElement('td');
     const checkBtn = document.createElement('button');
     checkBtn.classList.add(_classList);
@@ -35,19 +39,19 @@ const libraryModule = ((library) => {
     return checkBtn;
   };
 
-  const removeBook = (index) => {
-    library.splice(index, 1);
-  };
+  removeBook(index) {
+    this.library.splice(index, 1);
+  }
 
-  const toLocalStorage = () => {
-    localStorage.setItem('library', JSON.stringify(library));
-  };
+  toLocalStorage() {
+    localStorage.setItem('library', JSON.stringify(this.library));
+  }
 
-  const display = () => {
+  display() {
     const bookBody = document.querySelector('#books_body');
     bookBody.innerHTML = '';
 
-    library.forEach((book, index) => {
+    this.library.forEach((book, index) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${book.title}</td>
@@ -56,25 +60,25 @@ const libraryModule = ((library) => {
         <td>${book.status ? 'Read already' : 'Not yet'}</td>
       `;
       bookBody.appendChild(tr);
-      const checkBtn = createButton(tr, index, 'change_status_button', (book.status ? 'Unread it?' : 'Read it?'));
-      const rmBtn = createButton(tr, index, 'remove_button', 'remove');
+      const checkBtn = this.createButton(tr, index, 'change_status_button', (book.status ? 'Unread it?' : 'Read it?'));
+      const rmBtn = this.createButton(tr, index, 'remove_button', 'remove');
       checkBtn.addEventListener('click', (event) => {
         const index = event.target.getAttribute('data-attribute');
-        changeBookStatus(index);
-        toLocalStorage();
-        display();
+        this.changeBookStatus(index);
+        this.toLocalStorage();
+        this.display();
       });
       rmBtn.addEventListener('click', (event) => {
         const index = event.target.getAttribute('data-attribute');
-        removeBook(index);
-        toLocalStorage();
-        display();
+        this.removeBook(index);
+        this.toLocalStorage();
+        this.display();
       });
     });
-  };
+  }
+}
 
-  return { addBook, display, toLocalStorage };
-})(getSavedLibrary());
+const library = new Library(getSavedLibrary());
 
 const formModule = ((library) => {
   const form = document.getElementById('book_form');
@@ -104,7 +108,7 @@ const formModule = ((library) => {
   });
 
   return { form };
-})(libraryModule);
+})(library);
 
 const bookButton = (form) => {
   const button = document.getElementById('new_book_button');
@@ -114,5 +118,4 @@ const bookButton = (form) => {
 };
 
 // RUNNING CODE \\
-libraryModule.display();
 bookButton(formModule.form);
